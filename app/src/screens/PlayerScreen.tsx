@@ -85,6 +85,94 @@
 // export default PlayerScreen;
 
 
+// import AsyncStorage from "@react-native-async-storage/async-storage";
+// import { useVideoPlayer, VideoView } from "expo-video";
+// import React, { useEffect, useRef, useState } from "react";
+// import { StyleSheet, View } from "react-native";
+
+// const PlayerScreen = ({ route }) => {
+//   const { video } = route.params;
+//   const STORAGE_KEY = `video-progress-${video.id}`;
+//   const player = useVideoPlayer(video.url, (player) => {
+//     player.loop = false;
+//   });
+
+//   const [restored, setRestored] = useState(false);
+//   const hasStarted = useRef(false);
+
+//   useEffect(() => {
+//     if (!player || restored) return;
+
+//     const startTime = Date.now();
+
+//     const waitUntilReady = setInterval(async () => {
+//       const now = Date.now();
+//       const isReady =
+//         player.duration > 0 || player.currentTime > 0.1 || now - startTime > 10000;
+
+//       if (isReady && !hasStarted.current) {
+//         hasStarted.current = true;
+//         clearInterval(waitUntilReady);
+
+//         try {
+//           const saved = await AsyncStorage.getItem(STORAGE_KEY);
+//           const seekTo = saved ? parseFloat(saved) : 0;
+
+//           if (seekTo > 0 && seekTo < player.duration - 3) {
+//             player.currentTime = seekTo;
+//             console.log("⏩ Resumed from:", seekTo);
+//           }
+
+//           player.play();
+//         } catch (e) {
+//           console.log("AsyncStorage error:", e);
+//           player.play();
+//         }
+
+//         setRestored(true);
+//       }
+//     }, 300);
+
+//     return () => clearInterval(waitUntilReady);
+//   }, [player, restored]);
+
+//   useEffect(() => {
+//     if (!player || !restored) return;
+
+//     const interval = setInterval(() => {
+//       const time = player.currentTime;
+//       const duration = player.duration;
+
+//       if (duration && time / duration < 0.95) {
+//         AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(time));
+//       } else {
+//         AsyncStorage.removeItem(STORAGE_KEY);
+//       }
+//     }, 5000);
+
+//     return () => clearInterval(interval);
+//   }, [player, restored]);
+
+//   return (
+//     <View style={styles.container}>
+//       <VideoView
+//         style={styles.video}
+//         player={player}
+//         nativeControls
+//         allowsFullscreen
+//       />
+//     </View>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: { flex: 1, backgroundColor: "#000", justifyContent: "center" },
+//   video: { width: "100%", height: 275 },
+// });
+
+// export default PlayerScreen;
+
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useVideoPlayer, VideoView } from "expo-video";
 import React, { useEffect, useRef, useState } from "react";
@@ -102,61 +190,47 @@ const PlayerScreen = ({ route }) => {
 
   useEffect(() => {
     if (!player || restored) return;
-
     const startTime = Date.now();
-
     const waitUntilReady = setInterval(async () => {
       const now = Date.now();
-      const isReady =
-        player.duration > 0 || player.currentTime > 0.1 || now - startTime > 10000;
-
+      const isReady = player.duration > 0 || player.currentTime > 0.1 || now - startTime > 10000;
       if (isReady && !hasStarted.current) {
         hasStarted.current = true;
         clearInterval(waitUntilReady);
-
         try {
           const saved = await AsyncStorage.getItem(STORAGE_KEY);
           const seekTo = saved ? parseFloat(saved) : 0;
-
           if (seekTo > 0 && seekTo < player.duration - 3) {
             player.currentTime = seekTo;
-            console.log("⏩ Resumed from:", seekTo);
           }
-
           player.play();
         } catch (e) {
-          console.log("AsyncStorage error:", e);
           player.play();
         }
-
         setRestored(true);
       }
     }, 300);
-
     return () => clearInterval(waitUntilReady);
   }, [player, restored]);
 
   useEffect(() => {
     if (!player || !restored) return;
-
     const interval = setInterval(() => {
       const time = player.currentTime;
       const duration = player.duration;
-
       if (duration && time / duration < 0.95) {
         AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(time));
       } else {
         AsyncStorage.removeItem(STORAGE_KEY);
       }
     }, 5000);
-
     return () => clearInterval(interval);
   }, [player, restored]);
 
   return (
-    <View style={styles.container}>
+    <View style={playerStyles.container}>
       <VideoView
-        style={styles.video}
+        style={playerStyles.video}
         player={player}
         nativeControls
         allowsFullscreen
@@ -165,7 +239,7 @@ const PlayerScreen = ({ route }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const playerStyles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#000", justifyContent: "center" },
   video: { width: "100%", height: 275 },
 });

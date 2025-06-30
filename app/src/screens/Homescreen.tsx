@@ -201,25 +201,204 @@
 // export default HomeScreen;
 
 
+// import AsyncStorage from "@react-native-async-storage/async-storage";
+// import * as FileSystem from "expo-file-system";
+// import React, { useEffect, useState } from "react";
+// import {
+//     FlatList,
+//     Image,
+//     StyleSheet,
+//     Text,
+//     TouchableOpacity,
+//     View
+// } from "react-native";
+
+// // ... your video list
+// const videos = [
+//   {
+//     id: "bunny",
+//     title: "Big Buck Bunny",
+//     url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+//     thumbnail: "https://peach.blender.org/wp-content/uploads/title_anouncement.jpg?x11217",
+//     duration: "9:56",
+//   },
+//   {
+//     id: "sintel",
+//     title: "Sintel",
+//     url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+//     thumbnail: "https://media.kiteka.com/images/sintel-thumb.jpg",
+//     duration: "14:48",
+//   },
+// ];
+
+// const HomeScreen = ({ navigation }) => {
+//   const [downloadedMap, setDownloadedMap] = useState({});
+//   const [progressMap, setProgressMap] = useState({});
+
+//   useEffect(() => {
+//     checkDownloads();
+//   }, []);
+
+//   const getVideoFilePath = (videoId) =>
+//     `${FileSystem.documentDirectory}${videoId}.mp4`;
+
+//   const checkDownloads = async () => {
+//     const map = {};
+//     for (const v of videos) {
+//       const uri = await AsyncStorage.getItem(`local-video-${v.id}`);
+//       map[v.id] = uri ? true : false;
+//     }
+//     setDownloadedMap(map);
+//   };
+
+//   const handleDownload = async (video) => {
+//     const localPath = getVideoFilePath(video.id);
+
+//     const callback = (downloadProgress) => {
+//       const progress =
+//         downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+//       setProgressMap((prev) => ({
+//         ...prev,
+//         [video.id]: Math.floor(progress * 100),
+//       }));
+//     };
+
+//     const downloadResumable = FileSystem.createDownloadResumable(
+//       video.url,
+//       localPath,
+//       {},
+//       callback
+//     );
+
+//     try {
+//       const { uri } = await downloadResumable.downloadAsync();
+//       await AsyncStorage.setItem(`local-video-${video.id}`, uri);
+//       console.log("✅ Download complete:", uri);
+//       setProgressMap((prev) => ({ ...prev, [video.id]: 100 }));
+//       await checkDownloads();
+//     } catch (e) {
+//       console.error("❌ Download failed:", e);
+//       setProgressMap((prev) => ({ ...prev, [video.id]: null }));
+//     }
+//   };
+
+//   const handlePlay = async (video) => {
+//     const localUri = await AsyncStorage.getItem(`local-video-${video.id}`);
+//     const playUri = localUri || video.url;
+//     navigation.navigate("PlayerScreen", {
+//       video: { id: video.id, url: playUri },
+//     });
+//   };
+
+//   const renderItem = ({ item }) => (
+//     <View style={styles.card}>
+//       <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} />
+//       <View style={styles.info}>
+//         <Text style={styles.title}>{item.title}</Text>
+//         <Text style={styles.duration}>⏱ {item.duration}</Text>
+//         <View style={styles.actions}>
+//           <TouchableOpacity onPress={() => handlePlay(item)} style={styles.playButton}>
+//             <Text style={styles.playText}>▶️ Play</Text>
+//           </TouchableOpacity>
+
+//           {downloadedMap[item.id] ? (
+//             <Text style={styles.downloaded}>📥 Downloaded</Text>
+//           ) : progressMap[item.id] >= 0 ? (
+//             <Text style={styles.progressText}>⬇️ {progressMap[item.id]}%</Text>
+//           ) : (
+//             <TouchableOpacity onPress={() => handleDownload(item)}>
+//               <Text style={styles.download}>⬇️ Download</Text>
+//             </TouchableOpacity>
+//           )}
+//         </View>
+//       </View>
+//     </View>
+//   );
+
+//   return (
+//     <FlatList
+//       data={videos}
+//       keyExtractor={(item) => item.id}
+//       renderItem={renderItem}
+//       contentContainerStyle={{ padding: 10 }}
+//     />
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   card: {
+//     flexDirection: "row",
+//     marginBottom: 15,
+//     backgroundColor: "#eee",
+//     borderRadius: 10,
+//   },
+//   thumbnail: {
+//     width: 120,
+//     height: 80,
+//     borderTopLeftRadius: 10,
+//     borderBottomLeftRadius: 10,
+//   },
+//   info: {
+//     flex: 1,
+//     padding: 10,
+//     justifyContent: "space-between",
+//   },
+//   title: {
+//     fontSize: 16,
+//     fontWeight: "bold",
+//   },
+//   duration: {
+//     fontSize: 12,
+//     color: "#666",
+//   },
+//   actions: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     alignItems: "center",
+//   },
+//   playButton: {
+//     padding: 5,
+//     backgroundColor: "#222",
+//     borderRadius: 5,
+//   },
+//   playText: {
+//     color: "#fff",
+//   },
+//   downloaded: {
+//     color: "green",
+//     fontWeight: "bold",
+//   },
+//   download: {
+//     color: "blue",
+//   },
+//   progressText: {
+//     color: "#555",
+//     fontSize: 13,
+//     fontWeight: "600",
+//   },
+// });
+
+// export default HomeScreen;
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system";
 import React, { useEffect, useState } from "react";
 import {
-    FlatList,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
-// ... your video list
 const videos = [
   {
     id: "bunny",
     title: "Big Buck Bunny",
     url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    thumbnail: "https://peach.blender.org/wp-content/uploads/title_anouncement.jpg?x11217",
+    thumbnail:
+      "https://peach.blender.org/wp-content/uploads/title_anouncement.jpg?x11217",
     duration: "9:56",
   },
   {
@@ -229,11 +408,27 @@ const videos = [
     thumbnail: "https://media.kiteka.com/images/sintel-thumb.jpg",
     duration: "14:48",
   },
+
+     {
+        id: '3',
+        title: 'Tears of Steel',
+    thumbnail: "https://media.kiteka.com/images/sintel-thumb.jpg",
+duration: "14:48",
+        url: 'https://bitdash-a.akamaihd.net/content/tears/hls/playlist.m3u8',
+    },
+    {
+        id: '4',
+        title: 'Bunny 720p',
+         thumbnail: "https://media.kiteka.com/images/sintel-thumb.jpg",
+duration: "14:48",
+        url: 'https://moose.adc.washington.edu/media/bbb_720p/bbb_720p.m3u8',
+    },
 ];
 
 const HomeScreen = ({ navigation }) => {
   const [downloadedMap, setDownloadedMap] = useState({});
   const [progressMap, setProgressMap] = useState({});
+  const [watchStatusMap, setWatchStatusMap] = useState({});
 
   useEffect(() => {
     checkDownloads();
@@ -243,12 +438,32 @@ const HomeScreen = ({ navigation }) => {
     `${FileSystem.documentDirectory}${videoId}.mp4`;
 
   const checkDownloads = async () => {
-    const map = {};
+    const downloadMap = {};
+    const watchMap = {};
+
     for (const v of videos) {
       const uri = await AsyncStorage.getItem(`local-video-${v.id}`);
-      map[v.id] = uri ? true : false;
+      const watchedTime = await AsyncStorage.getItem(
+        `video-progress-${v.id}`
+      );
+
+      downloadMap[v.id] = !!uri;
+
+      const time = parseFloat(watchedTime || "0");
+      // For this demo, we'll assume 10 mins video (600 sec)
+      if (time > 0) {
+        if (time / 600 > 0.95) {
+          watchMap[v.id] = "watched";
+        } else {
+          watchMap[v.id] = "continue";
+        }
+      } else {
+        watchMap[v.id] = "never";
+      }
     }
-    setDownloadedMap(map);
+
+    setDownloadedMap(downloadMap);
+    setWatchStatusMap(watchMap);
   };
 
   const handleDownload = async (video) => {
@@ -256,7 +471,8 @@ const HomeScreen = ({ navigation }) => {
 
     const callback = (downloadProgress) => {
       const progress =
-        downloadProgress.totalBytesWritten / downloadProgress.totalBytesExpectedToWrite;
+        downloadProgress.totalBytesWritten /
+        downloadProgress.totalBytesExpectedToWrite;
       setProgressMap((prev) => ({
         ...prev,
         [video.id]: Math.floor(progress * 100),
@@ -273,7 +489,6 @@ const HomeScreen = ({ navigation }) => {
     try {
       const { uri } = await downloadResumable.downloadAsync();
       await AsyncStorage.setItem(`local-video-${video.id}`, uri);
-      console.log("✅ Download complete:", uri);
       setProgressMap((prev) => ({ ...prev, [video.id]: 100 }));
       await checkDownloads();
     } catch (e) {
@@ -290,24 +505,39 @@ const HomeScreen = ({ navigation }) => {
     });
   };
 
+  const getPlayLabel = (id) => {
+    const status = watchStatusMap[id];
+    if (status === "watched") return "🔁 Watch Again";
+    if (status === "continue") return "⏩ Continue Watching";
+    return "▶️ Play";
+  };
+
   const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} />
-      <View style={styles.info}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.duration}>⏱ {item.duration}</Text>
-        <View style={styles.actions}>
-          <TouchableOpacity onPress={() => handlePlay(item)} style={styles.playButton}>
-            <Text style={styles.playText}>▶️ Play</Text>
+    <View style={landingStyles.card}>
+      <Image
+        source={{ uri: item.thumbnail }}
+        style={landingStyles.thumbnail}
+      />
+      <View style={landingStyles.info}>
+        <Text style={landingStyles.title}>{item.title}</Text>
+        <Text style={landingStyles.duration}>⏱ {item.duration}</Text>
+        <View style={landingStyles.actions}>
+          <TouchableOpacity
+            onPress={() => handlePlay(item)}
+            style={landingStyles.playButton}
+          >
+            <Text style={landingStyles.playText}>{getPlayLabel(item.id)}</Text>
           </TouchableOpacity>
 
           {downloadedMap[item.id] ? (
-            <Text style={styles.downloaded}>📥 Downloaded</Text>
+            <Text style={landingStyles.downloaded}>📥 Downloaded</Text>
           ) : progressMap[item.id] >= 0 ? (
-            <Text style={styles.progressText}>⬇️ {progressMap[item.id]}%</Text>
+            <Text style={landingStyles.progressText}>
+              ⬇️ {progressMap[item.id]}%
+            </Text>
           ) : (
             <TouchableOpacity onPress={() => handleDownload(item)}>
-              <Text style={styles.download}>⬇️ Download</Text>
+              <Text style={landingStyles.download}>⬇️ Download</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -325,7 +555,7 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const landingStyles = StyleSheet.create({
   card: {
     flexDirection: "row",
     marginBottom: 15,
